@@ -341,6 +341,24 @@ impl Runnable {
             Waker::from_raw(raw_waker)
         }
     }
+
+    /// Converts this task into a raw pointer.
+    pub fn into_raw(self) -> *mut () {
+        let ptr = self.ptr.as_ptr();
+        mem::forget(self);
+        ptr
+    }
+
+    /// Converts a raw pointer into a task.
+    ///
+    /// This method should only be used with raw pointers returned from [`into_raw`].
+    ///
+    /// [`into_raw`]: #method.into_raw
+    pub unsafe fn from_raw(raw: *mut ()) -> Self {
+        Self {
+            ptr: NonNull::new_unchecked(raw as *mut ()),
+        }
+    }
 }
 
 impl Drop for Runnable {
